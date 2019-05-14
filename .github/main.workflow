@@ -9,7 +9,7 @@ action "snyk-code" {
   env = {
     PROJECT_PATH  = "/github/workspace"
   }
-  runs = ["bash", "-c", "/docker-python-entrypoint.sh test --org=${SNYK_ORG}"]
+  runs = ["bash", "-c", "/docker-python-entrypoint.sh test --org=${SNYK_ORG} --file=requirements.txt"]
 }
 
 action "lint" {
