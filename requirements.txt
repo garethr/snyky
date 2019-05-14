@@ -1,8 +1,12 @@
 -i https://pypi.org/simple
+certifi==2019.3.9
 click==7.0
 flask==0.12.0
 gunicorn==19.9.0
 itsdangerous==1.1.0
 jinja2==2.10.1
 markupsafe==1.1.1
+pipenv==2018.11.26
+virtualenv-clone==0.5.3
+virtualenv==16.5.0
 werkzeug==0.15.2
