@@ -1,6 +1,6 @@
 workflow "Testing" {
   on = "push"
-  resolves = ["snyk-code", "lint", "snyk-image"]
+  resolves = ["snyk-code", "lint"]
 }
 
 action "snyk-code" {
@@ -10,6 +10,7 @@ action "snyk-code" {
     PROJECT_PATH  = "/github/workspace"
   }
   runs = ["bash", "-c", "/docker-python-entrypoint.sh test --org=${SNYK_ORG} --file=requirements.txt"]
+  needs = "snyk-image"
 }
 
 action "lint" {
