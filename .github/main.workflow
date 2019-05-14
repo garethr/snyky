@@ -9,9 +9,7 @@ action "snyk-code" {
   env = {
     PROJECT_PATH  = "/github/workspace"
   }
-  args = "test --org=${SNYK_ORG}"
-  runs = ["sh", "-c", "/docker-python-entrypoint.sh"]
-
+  runs = ["sh", "-c", "/docker-python-entrypoint.sh", "test", "--org=${SNYK_ORG}"]
 }
 
 action "lint" {
@@ -30,8 +28,7 @@ action "snyk-image" {
   env = {
     PROJECT_PATH  = "/github/workspace"
   }
-  args = "test --docker sample --file=Dockerfile --org=${SNYK_ORG}"
-  runs = ["sh", "-c", "/docker-entrypoint.sh"]
+  runs = ["sh", "-c", "/docker-entrypoint.sh", "test", "--docker", "sample", "--file=Dockerfile", "--org=${SNYK_ORG}"]
   needs = "build"
 }
 
