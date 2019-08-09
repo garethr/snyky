@@ -1,0 +1,18 @@
+on: push
+name: Testing
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: lint
+      uses: actions/docker/cli@master
+      with:
+        args: run -i hadolint/hadolint hadolint - < Dockerfile
+    - name: snyk-test
+      uses: docker://snyk/snyk-cli:python-3
+      env:
+        ENV_FLAGS: --org=${{ secrets.SNYK_ORK }}
+        PROJECT_FOLDER: /github/workspace
+        PROJECT_PATH: /github/workspace
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
