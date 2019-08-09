@@ -1,15 +1,16 @@
 workflow "Testing" {
   on = "push"
-  resolves = ["snyk-code", "lint"]
+  resolves = ["snyk-test", "lint"]
 }
 
-action "snyk-code" {
-  uses = "docker://garethr/snyk-cli:python-3"
+action "snyk-test" {
+  uses = "docker://snyk/snyk-cli:python-3"
   secrets = ["SNYK_TOKEN", "SNYK_ORG"]
   env = {
+    PROJECT_FOLDER = "/github/workspace"
+    ENV_FLAGS = "--org=${SNYK_ORK}"
     PROJECT_PATH  = "/github/workspace"
   }
-  runs = ["bash", "-c", "/docker-python-entrypoint.sh test --org=${SNYK_ORG} --file=requirements.txt"]
 }
 
 action "lint" {
