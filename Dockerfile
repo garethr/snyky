@@ -1,5 +1,8 @@
 FROM python:3.7-alpine3.8 AS base
 
+# Install a known vulnerable package
+RUN apk add --no-cache --update git=2.18.1-r0
+
 WORKDIR /app
 RUN pip3 install pipenv
 
