@@ -28,5 +28,5 @@ jobs:
         PROJECT_PATH: /github/workspace
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        entrypoint: sh
-        args: -c /docker-entrypoint.sh test --docker sample --file=Dockerfile
+        entrypoint: sh -c /docker-entrypoint.sh
+        args: test --docker sample --file=Dockerfile
