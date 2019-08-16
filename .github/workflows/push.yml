@@ -8,6 +8,7 @@ jobs:
     - name: security
       uses: actions/docker/cli@master
       env:
+        DOCKER_BUILDKIT: 1
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
         args: build --build-arg SNYK_TOKEN --target Security .
@@ -19,7 +20,7 @@ jobs:
     - name: build
       uses: actions/docker/cli@master
       env:
-          DOCKER_BUILDKIT: 1
+        DOCKER_BUILDKIT: 1
       with:
         args: build -t sample .
     - name: snyk-image
