@@ -18,6 +18,8 @@ jobs:
     - uses: actions/checkout@master
     - name: build
       uses: actions/docker/cli@master
+      env:
+          DOCKER_BUILDKIT: 1
       with:
         args: build -t sample .
     - name: snyk-image
