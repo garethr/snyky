@@ -1,14 +1,10 @@
 on: push
 name: Testing
 jobs:
-  lint:
+  security:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: lint
-      uses: actions/docker/cli@master
-      with:
-        args: run -i hadolint/hadolint hadolint - < Dockerfile
     - name: security
       uses: actions/docker/cli@master
       env:
