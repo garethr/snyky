@@ -23,10 +23,9 @@ jobs:
       with:
         args: build -t sample .
     - name: snyk-image
-      uses: docker://garethr/snyk-cli:docker
+      uses: docker://snyk/snyk-cli:docker
       env:
         PROJECT_PATH: /github/workspace
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        entrypoint: sh -c /docker-entrypoint.sh
         args: test --docker sample --file=Dockerfile
