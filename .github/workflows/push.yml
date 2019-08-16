@@ -11,3 +11,20 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
         args: build --build-arg SNYK_TOKEN --target Security .
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: build
+      uses: actions/docker/cli@master
+      with:
+        args: build -t sample .
+    - name: snyk-image
+      uses: docker://garethr/snyk-cli:docker
+      env:
+        PROJECT_PATH: /github/workspace
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        entrypoint: sh
+        args: -c /docker-entrypoint.sh test --docker sample --file=Dockerfile
