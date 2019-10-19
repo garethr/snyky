@@ -1,0 +1,47 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: snyky-pipeline
+spec:
+  resources:
+    - name: source-repo
+      type: git
+  tasks:
+    - name: pipfile-conftest
+      taskRef:
+        name: conftest
+      params:
+        - name: files
+          value: Pipfile
+        - name: args
+          value:
+            - --input
+            - toml
+            - --namespace
+            - pipfile
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+    - name: helm-conftest
+      taskRef:
+        name: helm-conftest
+      params:
+        - name: chart
+          value: snyky
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: snyky-git
+spec:
+  type: git
+  params:
+    - name: revision
+      value: master
+    - name: url
+      value: https://github.com/garethr/snyky.git

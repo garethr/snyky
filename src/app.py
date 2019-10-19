@@ -1,20 +1,17 @@
 import logging
+
 from flask import Flask
 
 
-def app():
-    application = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
 
-    @application.route("/")
+    @app.route("/")
     def hello():
         return "Hello World"
 
-    @application.route("/error")
-    def error():
-        assert application.debug == False
-
-    return application
+    return app
 
 
 if __name__ == "__main__":
-    app().run(host="0.0.0.0")
+    create_app().run(host="0.0.0.0")

@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: snyky-pipeline-run
+spec:
+  pipelineRef:
+    name: snyky-pipeline
+  resources:
+    - name: source-repo
+      resourceRef:
+        name: snyky-git
