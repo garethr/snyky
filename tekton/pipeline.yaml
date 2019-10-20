@@ -7,9 +7,18 @@ spec:
     - name: source-repo
       type: git
   tasks:
+    - name: conftest-verify
+      taskRef:
+        name: conftest-verify
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
     - name: pipfile-conftest
       taskRef:
         name: conftest
+      runAfter:
+        - conftest-verify
       params:
         - name: files
           value: Pipfile
@@ -23,12 +32,53 @@ spec:
         inputs:
           - name: source
             resource: source-repo
+    - name: dockerfile-conftest
+      taskRef:
+        name: conftest
+      runAfter:
+        - conftest-verify
+      params:
+        - name: files
+          value: Dockerfile
+        - name: args
+          value:
+            - --namespace
+            - docker
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+    - name: pytest-conftest
+      taskRef:
+        name: conftest
+      runAfter:
+        - conftest-verify
+      params:
+        - name: files
+          value: pytest.ini
+        - name: args
+          value:
+            - --namespace
+            - pytest
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
     - name: helm-conftest
       taskRef:
         name: helm-conftest
+      runAfter:
+        - conftest-verify
       params:
         - name: chart
           value: snyky
+      resources:
+        inputs:
+          - name: source
+            resource: source-repo
+    - name: snyk
+      taskRef:
+        name: snyk-python
       resources:
         inputs:
           - name: source
@@ -45,3 +95,22 @@ spec:
       value: master
     - name: url
       value: https://github.com/garethr/snyky.git
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: conftest-verify
+spec:
+  inputs:
+    resources:
+    - name: source
+      type: git
+      targetPath: source
+  steps:
+  - name: conftest-verify
+    workingdir: /workspace/source
+    image: instrumenta/conftest:latest
+    command:
+      - conftest
+      - verify
+
