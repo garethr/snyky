@@ -5,13 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: security
-      uses: actions/docker/cli@master
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/python@master
       env:
-        DOCKER_BUILDKIT: 1
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: build --build-arg SNYK_TOKEN --target Security .
 
   image:
     runs-on: ubuntu-latest
@@ -23,10 +20,9 @@ jobs:
         DOCKER_BUILDKIT: 1
       with:
         args: build -t sample .
-    - name: snyk-image
-      uses: docker://snyk/snyk-cli:docker
+    - name: Run Snyk to check Docker image for vulnerabilities
+      uses: snyk/actions/docker@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        entrypoint: /home/node/docker-entrypoint.sh
-        args: test --docker sample --file=/github/workspace/Dockerfile
+        image: sample
