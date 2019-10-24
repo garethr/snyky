@@ -24,3 +24,4 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
         image: sample
+        args: --file=Dockerfile
