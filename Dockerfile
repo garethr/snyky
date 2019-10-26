@@ -27,7 +27,7 @@ RUN pytest
 FROM dev-base AS Security
 ARG SNYK_TOKEN
 RUN apk add --no-cache libstdc+
-COPY --from=garethr/snyk-alpine:latest /usr/local/bin/snyk /usr/local/bin/sny
+COPY --from=snyk/snyk:alpine:latest /usr/local/bin/snyk /usr/local/bin/sny
 RUN pipenv update
 RUN /usr/local/bin/snyk test
 
