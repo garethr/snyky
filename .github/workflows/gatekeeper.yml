@@ -8,7 +8,7 @@ jobs:
     - name: Generate ConstraintTemplates for Gatekeeper 
       uses: garethr/policytool/action@master
       with:
-        args: gatekeeper/*.rego
+        args: gatekeeper/SecurityControls.rego
     - name: Commit to repository
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
