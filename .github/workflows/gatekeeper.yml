@@ -6,7 +6,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Generate ConstraintTemplates for Gatekeeper 
-      uses: garethr/policytool/action@master
+      uses: garethr/policykit/action@master
       with:
         args: gatekeeper
     - name: Commit to repository
