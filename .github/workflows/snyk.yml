@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Run Snyk to check for vulnerabilities
+    - name: Run Snyk to check for Python vulnerabilities
       uses: snyk/actions/python@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -17,11 +17,11 @@ jobs:
     - name: build
       env:
         DOCKER_BUILDKIT: 1
-      run: docker build -t sample .
+      run: docker build --pull -t snyky .
     - name: Run Snyk to check Docker image for vulnerabilities
       uses: snyk/actions/docker@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        image: sample
+        image: snyky
         args: --file=Dockerfile
