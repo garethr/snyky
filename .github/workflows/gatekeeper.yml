@@ -1,7 +1,7 @@
 on: push
 name: Build
 jobs:
-  security:
+  gatekeeper:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
