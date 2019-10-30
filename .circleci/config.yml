@@ -35,7 +35,7 @@ jobs:
       - conftest/install
       - run:
           name: Test Pipfile
-          command: conftest --input toml --namespace pipfile Pipfile
+          command: conftest test --input toml --namespace pipfile Pipfile
 
 workflows:
   version: 2
