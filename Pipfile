@@ -11,6 +11,7 @@ gunicorn = "*"
 pytest-flask = "*"
 pytest-black = "*"
 pytest-isort = "*"
+policykit = "*"
 
 [requires]
 python_version = "3.7"
