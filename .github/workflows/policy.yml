@@ -19,7 +19,7 @@ jobs:
       with:
         files: Dockerfile
         namespace: docker
-   helm:
+  helm:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
