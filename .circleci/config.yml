@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   conftest: kenfdev/conftest-orb@0.0.9
 jobs:
-  build:
+  python:
     docker:
       - image: circleci/python:3.7.4
         environment:
@@ -27,3 +27,13 @@ jobs:
           name: run tests
           command: |
             pipenv run pytest
+  policy:
+    docker:
+      - image: circleci/buildpack-deps:latest
+    steps:
+      - checkout
+      - conftest/install
+      - run:
+          name: Test Pipfile
+          command: conftest --input toml --namespace pipfile Pipfile
+
