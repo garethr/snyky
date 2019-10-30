@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  conftest-orb: kenfdev/conftest-orb@0.0.9
+  conftest: kenfdev/conftest-orb@0.0.9
 jobs:
   build:
     docker:
