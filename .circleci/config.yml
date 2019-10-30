@@ -36,6 +36,12 @@ jobs:
       - run:
           name: Test Pipfile
           command: conftest test --input toml --namespace pipfile Pipfile
+      - run:
+          name: Test pytest.ini
+          command: conftest test --namespace pytest pytest.ini
+      - run:
+          name: Test Dockerfile
+          command: conftest test --namespace docker Dockerfile
 
 workflows:
   version: 2
