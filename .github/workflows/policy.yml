@@ -21,3 +21,7 @@ jobs:
         files: Pipfile
         input: toml
         namespace: pipfile
+    - name: Test Helm Chart
+      uses: instrumenta/conftest-action/helm@master
+      with:
+        chart: snyky
