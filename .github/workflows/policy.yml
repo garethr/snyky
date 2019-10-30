@@ -1,7 +1,7 @@
 on: push
 name: Policy
 jobs:
-  conftest:
+  pytest:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -10,17 +10,19 @@ jobs:
       with:
         files: pytest.ini
         namespace: pytest
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
     - name: Test Dockerfile
       uses: instrumenta/conftest-action@master
       with:
         files: Dockerfile
         namespace: docker
-    - name: Test Pipfile
-      uses: instrumenta/conftest-action@master
-      with:
-        files: Pipfile
-        input: toml
-        namespace: pipfile
+   helm:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
     - name: Test Helm Chart
       uses: instrumenta/conftest-action/helm@master
       with:
