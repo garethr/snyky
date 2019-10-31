@@ -1,4 +1,4 @@
-package kubernetes
+package lib.kubernetes
 
 name = input.metadata.name
 

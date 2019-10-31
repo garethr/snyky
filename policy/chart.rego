@@ -1,6 +1,6 @@
 package main
 
-import data.kubernetes
+import data.lib.kubernetes
 
 deny[msg] {
 	kubernetes.containers[container]
