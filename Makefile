@@ -3,6 +3,10 @@ IMAGE := "garethr/snyky"
 NAME := "snyky"
 BUILD = docker build
 
+default: test
+
+include tekton/Makefile
+
 check-buildkit:
 ifndef DOCKER_BUILDKIT
 	$(error You must enable Buildkit for Docker, by setting DOCKER_BUILDKIT=1)

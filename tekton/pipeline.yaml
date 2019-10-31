@@ -113,4 +113,3 @@ spec:
     command:
       - conftest
       - verify
-
