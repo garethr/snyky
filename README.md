@@ -56,8 +56,6 @@ WARN - pytest.ini - Consider enabling coverage reporting for test
 
 You can see the policy in [policy/pytest.rego](policy/pytest.rego).
 
-
-
 ### 2. Using GitHub Actions
 
 ### 3. In CircleCI
@@ -67,6 +65,32 @@ You can see the policy in [policy/pytest.rego](policy/pytest.rego).
 ### 5. Using Docker
 
 ### 6. As part of a Python unit test suite
+
+Using [Policykit](https://github.com/garethr/policykit/) it's possible to integrate Conftest output with Python, and to
+use it with a unit testing framework, in this case pytest.
+
+```console
+$ pipenv run pytest src/test_policy.py
+========================================= test session starts ==========================================
+platform darwin -- Python 3.7.4, pytest-5.2.2, py-1.8.0, pluggy-0.13.0
+cachedir: .pytest_cache
+rootdir: /Users/garethr/Documents/snyky, inifile: pytest.ini
+plugins: isort-0.3.1, black-0.3.7, flask-0.15.0
+collected 7 items
+
+src/test_policy.py::BLACK SKIPPED                                                                 [ 14%]
+src/test_policy.py::ISORT SKIPPED                                                                 [ 28%]
+src/test_policy.py::TestPolicy::test_policy PASSED                                                [ 42%]
+src/test_policy.py::TestPolicy::test_pytest_config PASSED                                         [ 57%]
+src/test_policy.py::TestPolicy::test_pipfile PASSED                                               [ 71%]
+src/test_policy.py::TestPolicy::test_dockerfile PASSED                                            [ 85%]
+src/test_policy.py::TestPolicy::test_kubernetes_manifest_for_warnings PASSED                      [100%]
+
+===================================== 5 passed, 2 skipped in 0.47s =====================================
+```
+
+You can see the unit tests in [src/test_policy.py](src/test_policy.py).
+
 
 ### 7. Using Gatekeeper
 
@@ -106,5 +130,3 @@ The full set of examples requires several tools to be installed:
 * Python 3.7+
 * Snyk
 * Tilt
-
-
