@@ -46,8 +46,14 @@ deny[msg] {
 # https://kubesec.io/basics/containers-securitycontext-readonlyrootfilesystem-true/
 deny[msg] {
 	kubernetes.containers[container]
-	not container.securityContext.readOnlyRootFilesystem = true
+    kubernetes.no_read_only_filesystem(container)
 	msg = sprintf("%s in the %s %s is not using a read only root filesystem", [container.name, kubernetes.kind, kubernetes.name])
+}
+
+deny[msg] {
+	kubernetes.containers[container]
+    kubernetes.priviledge_escalation_allowed(container)
+	msg = sprintf("%s in the %s %s allows priviledge escalation", [container.name, kubernetes.kind, kubernetes.name])
 }
 
 # https://kubesec.io/basics/containers-securitycontext-runasnonroot-true/

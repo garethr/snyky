@@ -62,3 +62,25 @@ dropped_capability(container, cap) {
 added_capability(container, cap) {
 	container.securityContext.capabilities.add[_] == cap
 }
+
+has_field(object, field) = true {
+    object[field]
+}
+
+no_read_only_filesystem(c) {
+    not has_field(c, "securityContext")
+}
+
+no_read_only_filesystem(c) {
+    has_field(c, "securityContext")
+    not has_field(c.securityContext, "readOnlyRootFilesystem")
+}
+
+priviledge_escalation_allowed(c) {
+    not has_field(c, "securityContext")
+}
+
+priviledge_escalation_allowed(c) {
+    has_field(c, "securityContext")
+    has_field(c.securityContext, "allowPrivilegeEscalation")
+}
