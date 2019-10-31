@@ -16,13 +16,13 @@ Snyky makes extensive use of [Opne Policy Agent](https://openpolicyagent.org) to
 These policies can be applied in a variety of different ways. Note this is for demonstration purposes only, it's likely that
 you would only use one or two of these in a real application.
 
-1. Using Conftest
-2. Using GitHub Actions
-3. In CircleCI
-4. In a Tekton Pipeline
-5. Using Docker
-6. As part of a Python unit test suite
-7. Using Gatekeeper
+1. [Using Conftest](#1-using-conftest)
+2. [Using GitHub Actions](#2-using-github-actions)
+3. [In CircleCI](#3-in-circleci)
+4. [In a Tekton Pipeline](#4-in-a-tekton-pipeline)
+5. [Using Docker](#5-using-docker)
+6. [As part of a Python unit test suite](#6-as-part-of-a-python-unit-test-suite)
+7. [Using Gatekeeper](#7-using-gatekeeper)
 
 
 ### 1. Using Conftest 
