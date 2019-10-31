@@ -5,11 +5,16 @@ BUILD = docker build
 
 default: test
 
-include tekton/Makefile
+TARGET = $$(echo $@ | cut -d "-" -f 2- | sed "s/%*$$//")
 
 check-buildkit:
 ifndef DOCKER_BUILDKIT
 	$(error You must enable Buildkit for Docker, by setting DOCKER_BUILDKIT=1)
+endif
+
+check-snyk-token:
+ifndef SNYK_TOKEN
+	$(error You must have a SNYK_TOKEN to enable the snyk tasks1)
 endif
 
 build: check-buildkit
@@ -18,7 +23,7 @@ build: check-buildkit
 test: check-buildkit
 	@$(BUILD) --target Test .
 
-snyk: check-buildkit
+snyk: check-buildkit check-snyk-token
 	@$(BUILD) --build-arg SNYK_TOKEN --target Security .
 
 policy: generate
@@ -26,8 +31,14 @@ policy: generate
 
 generate: snyky.yaml
 
-snyky.yaml: snyky/*
-	@helm template --name $(NAME) snyky > snyky.yaml
+$(NAME).yaml: $(NAME)/*
+	@helm template --name $(NAME) $(NAME) > $(NAME).yaml
+
+tekton-%:
+	@$(MAKE) -C tekton $(TARGET)
+
+gatekeeper-%:
+	@$(MAKE) -C gatekeeper $(TARGET)
 
 up:
 	tilt up
@@ -35,4 +46,4 @@ up:
 down:
 	tilt down
 
-.PHONY: build test snyk policy generate up down
+.PHONY: build test snyk policy generate tekton-% gatekeeper-% up down
