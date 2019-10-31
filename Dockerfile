@@ -16,20 +16,28 @@ COPY src /app
 
 
 FROM parent AS dev-base
-RUN pipenv install --deploy --system --dev
-COPY src /app
+COPY --from=instrumenta/conftest /conftest /usr/local/bin/conftest
+RUN pipenv install --dev
+COPY . /app
 
 
 FROM dev-base AS Test
-RUN pytest
+RUN pipenv run pytest
 
 
 FROM dev-base AS Security
 ARG SNYK_TOKEN
-RUN apk add --no-cache libstdc+
-COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/sny
+RUN apk add --no-cache libstdc++
+COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/snyk
 RUN pipenv update
-RUN /usr/local/bin/snyk test
+RUN snyk test
+
+
+FROM dev-base as Policy
+RUN conftest test --namespace pytest pytest.ini
+RUN conftest test --namespace pipfile --input toml Pipfile
+RUN conftest test --namespace docker Dockerfile
+RUN conftest test snyky.yaml
 
 
 FROM base AS Shell
