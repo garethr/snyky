@@ -216,25 +216,172 @@ You can see the unit tests in [src/test_policy.py](src/test_policy.py).
 
 Snyky also demonstrates different ways of integrating vulnerability scanning with a Python project using [Snyk](https://snyk.io).
 
-1. Using Snyk locally
-2. Using GitHub Actions
-3. In CircleCI
-4. In a Tekton Pipeline
-5. Using Docker
+1. [Using Snyk locally](#1-using-snyk-locally-1)
+2. [Using GitHub Actions](#2-using-github-actions-1)
+3. [In CircleCI](#3-in-circleci-1)
+4. [In a Tekton Pipeline](#4-in-a-tekton-pipeline-1)
+5. [Using Docker](#5-using-docker-1)
 
 
 ### 1. Using Snyk locally
 
+Snyk can be installed locally, using NPM, or using [Homebrew](https://github.com/snyk/homebrew-tap) or [Scoop](https://github.com/snyk/scoop-snyk).
+
+```console
+$ snyk test
+
+Tested 7 dependencies for known issues, found 2 issues, 2 vulnerable paths.
+
+
+Issues with no direct upgrade or patch:
+  ✗ Improper Input Validation [High Severity][https://snyk.io/vuln/SNYK-PYTHON-FLASK-42185] in flask@0.12
+  This issue was fixed in versions: 0.12.3
+  ✗ Denial of Service (DOS) [High Severity][https://snyk.io/vuln/SNYK-PYTHON-FLASK-451637] in flask@0.12
+  This issue was fixed in versions: 1.0
+
+
+
+Organization:      garethr
+Package manager:   pip
+Target file:       Pipfile
+Open source:       no
+Project path:      /Users/garethr/Documents/snyky
+Licenses:          enable
+```
+
 ### 2. Using GitHub Actions
+
+Snyk has a [set of GitHub Actions](https://github.com/garethr/snyk-actions) which can be used to check for vulnerabilities in
+appications and Docker images.
 
 ![Snyk](https://github.com/garethr/snyky/workflows/Snyk/badge.svg)
 
+For the workflow definition see [.github/workflows/snyk.yml](.github/workflow/snyk.yml).
+
 ### 3. In CircleCI
+
+Snyk has a [CircleCI Orb](https://circleci.com/orbs/registry/orb/snyk/snyk) which can be used to check for vulnerabilities
+in your CI builds.
 
 ### 4. In a Tekton Pipeline
 
+Snyk has a set of [Tekton Tasks](https://github.com/garethr/snyk-tekton) which can be used to check for vulnerabilities in
+your pipelines. Configuration is as simple as adding a step to your pipeline definition and setting a secret with the `SNYK_TOKEN`. 
+
+```yaml
+- name: snyk
+  taskRef:
+    name: snyk-python
+  resources:
+    inputs:
+      - name: source
+        resource: source-rep
+```
+
+From the pipeline above you should see the Snyk output in the logs:
+
+```console
+$ tkn pipelinerun logs snyky-pipeline-run-xrg96 -f -n default
+...
+[snyk : snyk] All dependencies are now up-to-date!
+[snyk : snyk]
+[snyk : snyk] Testing /workspace/source...
+[snyk : snyk]
+[snyk : snyk] Tested 7 dependencies for known issues, found 2 issues, 2 vulnerable paths.
+[snyk : snyk]
+[snyk : snyk]
+[snyk : snyk] Issues with no direct upgrade or patch:
+[snyk : snyk]   ✗ Improper Input Validation [High Severity][https://snyk.io/vuln/SNYK-PYTHON-FLASK-42185] in flask@0.12
+[snyk : snyk]   This issue was fixed in versions: 0.12.3
+[snyk : snyk]   ✗ Denial of Service (DOS) [High Severity][https://snyk.io/vuln/SNYK-PYTHON-FLASK-451637] in flask@0.12
+[snyk : snyk]   This issue was fixed in versions: 1.0
+[snyk : snyk]
+[snyk : snyk]
+[snyk : snyk]
+[snyk : snyk] Organization:      garethr
+[snyk : snyk] Package manager:   pip
+[snyk : snyk] Target file:       Pipfile
+[snyk : snyk] Open source:       no
+[snyk : snyk] Project path:      /workspace/source
+[snyk : snyk] Licenses:          enabled
+[snyk : snyk
+```
+
 ### 5. Using Docker
 
+You'll need a valid `SNYK_TOKEN` environment variable set to use Snyk via the [Snyk Docker images](https://github.com/snyk/snyk-images).
+
+```console
+docker run --rm -it --env SNYK_TOKEN -v $(pwd):/app snyk/snyk:python
+```
+
+For more advanced usecases you can copy Snyk into your image and use it as part of a build. You can use:
+
+```
+COPY --from=snyk/snyk:linux /usr/local/bin/snyk /usr/local/bin/snyk
+```
+
+Or if using an Alpine image use:
+
+```dockerfile
+RUN apk add --no-cache libstdc+
+COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/snyk
+```
+
+You can see an example of this pattern in the `Dockerfile`, and you can run it like so:
+
+```console
+$ docker build --build-arg SNYK_TOKEN --target Security .
+[+] Building 21.2s (19/19) FINISHED
+ => [internal] load build definition from Dockerfile                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                        0.0s
+ => => transferring context: 2B                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/python:3.7-alpine3.8                                                  0.0s
+ => CACHED FROM docker.io/snyk/snyk:alpine                                                                               0.0s
+ => => resolve docker.io/snyk/snyk:alpine                                                                                1.2s
+ => FROM docker.io/instrumenta/conftest:latest                                                                           0.0s
+ => [pipenv 1/2] FROM docker.io/library/python:3.7-alpine3.8                                                             0.0s
+ => [internal] load build context                                                                                        0.1s
+ => => transferring context: 116.61kB                                                                                    0.1s
+ => CACHED [pipenv 2/2] RUN pip3 install pipenv                                                                          0.0s
+ => CACHED [parent 1/4] WORKDIR /app                                                                                     0.0s
+ => CACHED [parent 2/4] COPY Pipfile /app/                                                                               0.0s
+ => CACHED [parent 3/4] COPY Pipfile.lock /app/                                                                          0.0s
+ => CACHED [parent 4/4] RUN apk add --no-cache --update git=2.18.1-r0                                                    0.0s
+ => CACHED [dev-base 1/3] COPY --from=instrumenta/conftest /conftest /usr/local/bin/conftest                             0.0s
+ => CACHED [dev-base 2/3] RUN pipenv install --dev                                                                       0.0s
+ => [dev-base 3/3] COPY . /app                                                                                           0.2s
+ => [security 1/4] RUN apk add --no-cache libstdc++                                                                      1.5s
+ => [security 2/4] COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/snyk                                  0.2s
+ => [security 3/4] RUN pipenv update                                                                                    16.0s
+ => ERROR [security 4/4] RUN snyk test                                                                                   3.1s
+------
+ > [security 4/4] RUN snyk test:
+#19 2.716
+#19 2.716 Testing /app...
+#19 2.716
+#19 2.716 Tested 7 dependencies for known issues, found 2 issues, 2 vulnerable paths.
+#19 2.716
+#19 2.716
+#19 2.716 Issues with no direct upgrade or patch:
+#19 2.716   ✗ Improper Input Validation [High Severity][https://snyk.io/vuln/SNYK-PYTHON-FLASK-42185] in flask@0.12
+#19 2.716   This issue was fixed in versions: 0.12.3
+#19 2.716   ✗ Denial of Service (DOS) [High Severity][https://snyk.io/vuln/SNYK-PYTHON-FLASK-451637] in flask@0.12
+#19 2.716   This issue was fixed in versions: 1.0
+#19 2.716
+#19 2.716
+#19 2.716
+#19 2.716 Organization:      garethr
+#19 2.716 Package manager:   pip
+#19 2.716 Target file:       Pipfile
+#19 2.716 Open source:       no
+#19 2.716 Project path:      /app
+#19 2.716 Licenses:          enabled
+#19 2.717
+------
+failed to solve with frontend dockerfile.v0: failed to build LLB: executor failed running [/bin/sh -c snyk test]: runc did not terminate sucessfull
+```
 
 ## Installation
 
