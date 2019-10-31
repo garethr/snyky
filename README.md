@@ -68,6 +68,59 @@ For the build configuration see [.circleci/config.yml](.circleci/config.yml).
 
 ### 4. In a Tekton Pipeline
 
+[Tekton](https://tekton.dev) provides a Kubernetes-native pipeline. The following requires you to have a Kubernetes cluster
+running but will install the latest version of Tekton, as well as a custom pipeline for this project.
+
+```console
+$ make tekton-init
+namespace/tekton-pipelines unchanged
+podsecuritypolicy.policy/tekton-pipelines configured
+clusterrole.rbac.authorization.k8s.io/tekton-pipelines-admin unchanged
+serviceaccount/tekton-pipelines-controller unchanged
+...
+$ make tekton-pipeline
+pipeline.tekton.dev/snyky-pipeline created
+pipelineresource.tekton.dev/snyky-git created
+task.tekton.dev/conftest-verify create
+```
+
+We can use the [Tekton CLI](https://github.com/tektoncd/cli) to start a run of our pipeline:
+
+```console
+$ tkn pipeline start snyky-pipelin
+? Choose the git resource to use for source-repo: snyky-git (https://github.com/garethr/snyky.git)
+Pipelinerun started: snyky-pipeline-run-xrg96
+
+In order to track the pipelinerun progress run:
+tkn pipelinerun logs snyky-pipeline-run-xrg96 -f -n defaul
+```
+
+We can also use `tkn` to grab the logs.
+
+```console
+$ tkn pipelinerun logs snyky-pipeline-run-xrg96 -f -n default
+...
+[pytest-conftest : conftest] WARN - pytest.ini - Consider enforcing type checking when running tests
+[pytest-conftest : conftest] WARN - pytest.ini - Consider enabling coverage reporting for tests
+
+[conftest-verify : conftest-verify] PASS - policy/policy/pytest_test.rego - data.pytest.test_require_black
+[conftest-verify : conftest-verify] PASS - policy/policy/pytest_test.rego - data.pytest.test_require_isort
+[conftest-verify : conftest-verify] PASS - policy/policy/pytest_test.rego - data.pytest.test_require_isort_and_black
+[conftest-verify : conftest-verify] PASS - policy/policy/pytest_test.rego - data.pytest.test_recommend_coverage
+[conftest-verify : conftest-verify] PASS - policy/policy/pytest_test.rego - data.pytest.test_recommend_type_checker
+[conftest-verify : conftest-verify] PASS - policy/policy/pytest_test.rego - data.pytest.test_valid_with_required_options
+[conftest-verify : conftest-verify] PASS - policy/policy/pytest_test.rego - data.pytest.test_no_warnings_with_recommended_options
+...
+```
+
+If you prefer a graphical tool then run the Tekton dashboard:
+
+```console
+make tekton-dashboard
+```
+
+For the full pipeline configuration see [tekton/pipeline.yaml](tekton/pipeline.yaml).
+
 ### 5. Using Docker
 
 There are two approaches to using Conftest with Docker. The simplest is just mounting the project and running the Conftest Docker image like so.
@@ -187,12 +240,13 @@ Snyky also demonstrates different ways of integrating vulnerability scanning wit
 
 The full set of examples requires several tools to be installed:
 
-* Conftest
+* [Conftest](https://github.com/instrumenta/conftest)
 * Docker
-* Helm
-* Conftest plugin for Helm
+* [Helm](https://helm.sh/)
+* [Conftest plugin for Helm](https://github.com/instrumenta/helm-conftest)
 * Kubernetes
-* Pipenv
+* [Pipenv](https://github.com/pypa/pipenv)
 * Python 3.7+
-* Snyk
-* Tilt
+* [Snyk](https://snyk.io)
+* [Tilt](https://tilt.dev)
+* [`tkn`](https://github.com/tektoncd/cli) (The Tekton CLI) 

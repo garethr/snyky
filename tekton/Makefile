@@ -14,11 +14,10 @@ init: install conftest snyk
 install:
 	@$(APPLY) https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
 	@$(APPLY) https://github.com/tektoncd/dashboard/releases/download/v0.2.0/release.yaml
-	$(KUBECTL) label namespace/tekton-pipelines control-plane=1
 
 conftest:
 	@$(APPLY) https://raw.githubusercontent.com/tektoncd/catalog/master/conftest/conftest.yaml
-	@$(APPLY) -f https://raw.githubusercontent.com/tektoncd/catalog/master/conftest/helm-conftest.yaml
+	@$(APPLY) https://raw.githubusercontent.com/tektoncd/catalog/master/conftest/helm-conftest.yaml
 
 snyk: check-snyk-token
 	@$(APPLY) https://raw.githubusercontent.com/garethr/snyk-tekton/master/python/python.yaml
