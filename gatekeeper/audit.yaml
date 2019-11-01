@@ -1,10 +1,12 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: SecurityControls
 metadata:
-  name: deployment-and-pod-security-controls
+  name: audit-deployment-and-pod-security-controls
 spec:
-  # enforcementAction: dryrun
+  enforcementAction: dryrun
   match:
     kinds:
       - apiGroups: ["batch", "extensions", "apps", ""]
         kinds: ["Deployment", "Pod", "CronJob", "Job", "StatefulSet", "DaemonSet", "ConfigMap", "Service"]
+    namespaces: ["audit"]
+     
