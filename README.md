@@ -50,6 +50,20 @@ WARN - pytest.ini - Consider enabling coverage reporting for test
 
 You can see the policy in [policy/pytest.rego](policy/pytest.rego).
 
+The application is packaged as a Helm chart, and you can use the [Conftest Helm plugin](https://github.com/instrumenta/helm-conftest) to render the chart template and run the resulting manifests through the local policy:
+
+```console
+$ helm conftest snyky
+FAIL - snyky in the Deployment garethr/snyky has an image, snyky, using the latest tag
+FAIL - snyky in the Deployment snyky does not have a memory limit set
+FAIL - snyky in the Deployment snyky does not have a CPU limit set
+FAIL - snyky in the Deployment snyky doesn't drop all capabilities
+FAIL - snyky in the Deployment snyky is not using a read only root filesystem
+FAIL - snyky in the Deployment snyky allows priviledge escalation
+FAIL - snyky in the Deployment snyky is running as root
+Error: plugin "conftest" exited with erro
+```
+
 ### 2. Using GitHub Actions
 
 Conftest has a [GitHub Action](https://github.com/instrumenta/conftest-action) which makes integrating policy testing into GitHub easier. This includes Actions for using Conftest and a separate action for using the Conftest Helm plugin. You can see these running in this repository.
@@ -179,6 +193,20 @@ $ docker build --target Policy .
 failed to solve with frontend dockerfile.v0: failed to build LLB: executor failed running [/bin/sh -c conftest test snyky.yaml]: runc did not terminate sucessfully
 ```
 
+You can also use the Conftest Helm plugin via Docker as well:
+
+```console
+$ docker run --rm -it -v (pwd):/chart instrumenta/helm-conftest conftest snyky
+FAIL - snyky in the Deployment garethr/snyky has an image, snyky, using the latest tag
+FAIL - snyky in the Deployment snyky does not have a memory limit set
+FAIL - snyky in the Deployment snyky does not have a CPU limit set
+FAIL - snyky in the Deployment snyky doesn't drop all capabilities
+FAIL - snyky in the Deployment snyky is not using a read only root filesystem
+FAIL - snyky in the Deployment snyky allows priviledge escalation
+FAIL - snyky in the Deployment snyky is running as root
+Error: plugin "conftest" exited with erro
+```
+
 ### 6. As part of a Python unit test suite
 
 Using [Policykit](https://github.com/garethr/policykit/) it's possible to integrate Conftest output with Python, and to
@@ -209,7 +237,78 @@ You can see the unit tests in [src/test_policy.py](src/test_policy.py).
 
 ### 7. Using Gatekeeper
 
+The repository is also setup to make using [Gatekeeper](https://github.com/open-policy-agent/gatekeeper) possible as well.
+
+First we need to generate a Gatekeeper `ConstraintTemplate` from our rego policies. This is done using the GitHub Action from [Policykit](https://github.com/garethr/policykit/).
+
 ![Gatekeeper](https://github.com/garethr/snyky/workflows/Gatekeeper/badge.svg)
+
+This generates [policy/SecurityControls.yaml](policy/SecurityControls.yaml).
+
+(Note that currently this requires the [new `lib` functionality currently in HEAD](https://github.com/open-policy-agent/gatekeeper/pull/270).)
+
+```console
+kubectl apply -f policy/SecurityControls.yaml
+```
+
+With the `ConstraintTemplate` configured we can create a constraint:
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: SecurityControls
+metadata:
+  name: enforce-deployment-and-pod-security-controls
+spec:
+  match:
+    kinds:
+      - apiGroups: ["batch", "extensions", "apps", ""]
+        kinds: ["Deployment", "Pod", "CronJob", "Job", "StatefulSet", "DaemonSet", "ConfigMap", "Service"]
+```
+
+As configured above this will use the admission controller to block requests that do not meet our policies.
+
+```console
+$ kubectl apply -f gatekeeper/deployment.yaml
+Error from server ([denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment does not have a memory limit set
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment does not have a CPU limit set
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment doesn't drop all capabilities
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment is not using a read only root filesystem
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment is running as root): error when creating "deployment.yaml": admission webhook "validation.gatekeeper.sh" denied the request: [denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment does not have a memory limit set
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment does not have a CPU limit set
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment doesn't drop all capabilities
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment is not using a read only root filesystem
+[denied by enforce-deployment-and-pod-security-controls] nginx in the Deployment nginx-deployment is running as roo
+```
+
+We can also set the policies up in `dryrun` mode and view any violations in the status field of the constraint.
+
+```console
+$ kubectl get SecurityControls audit-deployment-and-pod-security-controls -o yaml
+...
+  - enforcementAction: dryrun
+    kind: Deployment
+    message: nginx in the Deployment nginx-deployment doesn't drop all capabilities
+    name: nginx-deployment
+    namespace: audit
+  - enforcementAction: dryrun
+    kind: Deployment
+    message: nginx in the Deployment nginx-deployment is not using a read only root
+      filesystem
+    name: nginx-deployment
+    namespace: audit
+  - enforcementAction: dryrun
+    kind: Deployment
+    message: nginx in the Deployment nginx-deployment allows priviledge escalation
+    name: nginx-deployment
+    namespace: audit
+  - enforcementAction: dryrun
+    kind: Deployment
+    message: nginx in the Deployment nginx-deployment is running as root
+    name: nginx-deployment
+    namespace: audit
+```
+
+Gatekeeper is opinionated about input and output, if you are interested in writing policies compatible with Gatekeeper and other OPA tools like Conftest then note the `is_gatekeeper` and `gatekeeper_format` rules in [policy/lib/kubernetes.rego](policy/lib/kubernetes.rego).
 
 
 ## Vulnerabilities
