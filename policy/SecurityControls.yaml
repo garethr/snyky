@@ -15,27 +15,28 @@ spec:
     - |
       package lib.kubernetes
 
-      default is_admission_review = false
+      default is_gatekeeper = false
 
-      is_admission_review {
+      is_gatekeeper {
               has_field(input, "review")
+              has_field(input.review, "object")
       }
 
       object = input {
-              not is_admission_review
+              not is_gatekeeper
       }
 
       object = input.review.object {
-              is_admission_review
+              is_gatekeeper
       }
 
       format(msg) = gatekeeper_format {
-              is_admission_review
+              is_gatekeeper
               gatekeeper_format = {"msg": msg}
       }
 
       format(msg) = msg {
-              not is_admission_review
+              not is_gatekeeper
       }
 
       name = object.metadata.name
