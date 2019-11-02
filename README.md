@@ -6,7 +6,7 @@ integrations described below.
 
 ## Policy
 
-Snyky makes extensive use of [Opne Policy Agent](https://openpolicyagent.org) to validate that various policies are met. This includes:
+Snyky makes extensive use of [Open Policy Agent](https://openpolicyagent.org) to validate that various policies are met. This includes:
 
 * Checking properties of the `pytest.ini` file
 * Checking the build instructions in the `Dockerfile`
