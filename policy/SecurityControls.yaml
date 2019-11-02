@@ -18,7 +18,7 @@ spec:
       default is_admission_review = false
 
       is_admission_review {
-          has_field(input, "review")
+              has_field(input, "review")
       }
 
       object = input {
@@ -31,7 +31,7 @@ spec:
 
       format(msg) = gatekeeper_format {
               is_admission_review
-          gatekeeper_format = {"msg": msg}
+              gatekeeper_format = {"msg": msg}
       }
 
       format(msg) = msg {
@@ -171,13 +171,13 @@ spec:
       # https://kubesec.io/basics/containers-securitycontext-readonlyrootfilesystem-true/
       violation[msg] {
               kubernetes.containers[container]
-          kubernetes.no_read_only_filesystem(container)
+              kubernetes.no_read_only_filesystem(container)
               msg = kubernetes.format(sprintf("%s in the %s %s is not using a read only root filesystem", [container.name, kubernetes.kind, kubernetes.name]))
       }
 
       violation[msg] {
               kubernetes.containers[container]
-          kubernetes.priviledge_escalation_allowed(container)
+              kubernetes.priviledge_escalation_allowed(container)
               msg = kubernetes.format(sprintf("%s in the %s %s allows priviledge escalation", [container.name, kubernetes.kind, kubernetes.name]))
       }
 
