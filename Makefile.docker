@@ -16,15 +16,15 @@ ifndef SNYK_TOKEN
 endif
 
 build: check-buildkit
-	@$(BUILD) -t $(IMAGE) ../
+	@$(BUILD) -t $(IMAGE) .
 
 test: check-buildkit
-	@$(BUILD) --target Test ../
+	@$(BUILD) --target Test .
 
 snyk: check-buildkit check-snyk-token
-	@$(BUILD) --build-arg SNYK_TOKEN --target Security ../
+	@$(BUILD) --build-arg SNYK_TOKEN --target Security .
 
 policy:
-	@$(BUILD) --target Policy ../
+	@$(BUILD) --target Policy .
 
 .PHONY: build test snyk policy

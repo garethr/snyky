@@ -15,7 +15,7 @@ gatekeeper-%:
 	@$(MAKE) -C gatekeeper $(TARGET)
 
 docker-%:
-	@$(MAKE) -C docker $(TARGET)
+	@$(MAKE) -f Makefile.docker $(TARGET)
 
 up:
 	tilt up
