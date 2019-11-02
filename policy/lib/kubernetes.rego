@@ -1,8 +1,31 @@
 package lib.kubernetes
 
-name = input.metadata.name
+default is_admission_review = false
 
-kind = input.kind
+is_admission_review {
+    has_field(input, "review")
+}
+
+object = input {
+	not is_admission_review
+}
+
+object = input.review.object {
+	is_admission_review
+}
+
+format(msg) = gatekeeper_format {
+	is_admission_review
+    gatekeeper_format = {"msg": msg}
+}
+
+format(msg) = msg {
+ 	not is_admission_review
+}
+
+name = object.metadata.name
+
+kind = object.kind
 
 is_service {
 	kind = "Service"
@@ -36,18 +59,18 @@ containers[container] {
 }
 
 containers[container] {
-	all_containers = pod_containers(input)
+	all_containers = pod_containers(object)
 	container = all_containers[_]
 }
 
 pods[pod] {
 	is_deployment
-	pod = input.spec.template
+	pod = object.spec.template
 }
 
 pods[pod] {
 	is_pod
-	pod = input
+	pod = object
 }
 
 volumes[volume] {
@@ -63,24 +86,24 @@ added_capability(container, cap) {
 	container.securityContext.capabilities.add[_] == cap
 }
 
-has_field(object, field) = true {
-    object[field]
+has_field(obj, field) {
+	obj[field]
 }
 
 no_read_only_filesystem(c) {
-    not has_field(c, "securityContext")
+	not has_field(c, "securityContext")
 }
 
 no_read_only_filesystem(c) {
-    has_field(c, "securityContext")
-    not has_field(c.securityContext, "readOnlyRootFilesystem")
+	has_field(c, "securityContext")
+	not has_field(c.securityContext, "readOnlyRootFilesystem")
 }
 
 priviledge_escalation_allowed(c) {
-    not has_field(c, "securityContext")
+	not has_field(c, "securityContext")
 }
 
 priviledge_escalation_allowed(c) {
-    has_field(c, "securityContext")
-    has_field(c.securityContext, "allowPrivilegeEscalation")
+	has_field(c, "securityContext")
+	has_field(c.securityContext, "allowPrivilegeEscalation")
 }
