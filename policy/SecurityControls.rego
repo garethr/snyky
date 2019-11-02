@@ -46,13 +46,13 @@ violation[msg] {
 # https://kubesec.io/basics/containers-securitycontext-readonlyrootfilesystem-true/
 violation[msg] {
 	kubernetes.containers[container]
-    kubernetes.no_read_only_filesystem(container)
+	kubernetes.no_read_only_filesystem(container)
 	msg = kubernetes.format(sprintf("%s in the %s %s is not using a read only root filesystem", [container.name, kubernetes.kind, kubernetes.name]))
 }
 
 violation[msg] {
 	kubernetes.containers[container]
-    kubernetes.priviledge_escalation_allowed(container)
+	kubernetes.priviledge_escalation_allowed(container)
 	msg = kubernetes.format(sprintf("%s in the %s %s allows priviledge escalation", [container.name, kubernetes.kind, kubernetes.name]))
 }
 

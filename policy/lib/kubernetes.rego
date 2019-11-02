@@ -3,7 +3,7 @@ package lib.kubernetes
 default is_admission_review = false
 
 is_admission_review {
-    has_field(input, "review")
+	has_field(input, "review")
 }
 
 object = input {
@@ -16,11 +16,11 @@ object = input.review.object {
 
 format(msg) = gatekeeper_format {
 	is_admission_review
-    gatekeeper_format = {"msg": msg}
+	gatekeeper_format = {"msg": msg}
 }
 
 format(msg) = msg {
- 	not is_admission_review
+	not is_admission_review
 }
 
 name = object.metadata.name
