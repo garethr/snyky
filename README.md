@@ -423,7 +423,7 @@ COPY --from=snyk/snyk:linux /usr/local/bin/snyk /usr/local/bin/snyk
 Or if using an Alpine image use:
 
 ```dockerfile
-RUN apk add --no-cache libstdc+
+RUN apk add --no-cache libstdc++
 COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/snyk
 ```
 
