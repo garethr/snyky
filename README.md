@@ -70,7 +70,7 @@ Conftest has a [GitHub Action](https://github.com/instrumenta/conftest-action) w
 
 ![Policy](https://github.com/garethr/snyky/workflows/Policy/badge.svg)
 
-For the workflow definition see [.github/workflows/policy.yml](.github/workflow/policy.yml).
+For the workflow definition see [.github/workflows/policy.yml](.github/workflows/policy.yml).
 
 ### 3. In CircleCI
 
@@ -355,7 +355,7 @@ appications and Docker images.
 
 ![Snyk](https://github.com/garethr/snyky/workflows/Snyk/badge.svg)
 
-For the workflow definition see [.github/workflows/snyk.yml](.github/workflow/snyk.yml).
+For the workflow definition see [.github/workflows/snyk.yml](.github/workflows/snyk.yml).
 
 ### 3. In CircleCI
 
