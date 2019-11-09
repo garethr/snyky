@@ -7,7 +7,7 @@ deny[msg] {
 }
 
 deny[msg] {
-	input.source[i].verify_ssl != true
+	not input.source[i].verify_ssl = true
 	name := input.source[i].name
 	msg := sprintf("You must verify SSL for %v", [name])
 }
