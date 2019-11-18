@@ -25,6 +25,8 @@ spec:
         - name: snyky
           image: "garethr/snyky:latest"
           imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
           ports:
             - name: http
               containerPort: 5000
@@ -39,5 +41,24 @@ spec:
               port: http
           resources:
             {}
-            
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: snyky
+  labels:
+    app.kubernetes.io/name: snyky
+    helm.sh/chart: snyky-0.1.0
+    app.kubernetes.io/instance: snyky
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Tiller
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: snyky
+    app.kubernetes.io/instance: snyky
