@@ -1,4 +1,6 @@
-FROM python:3.7-alpine3.8 AS pipenv
+#FROM python:3.7.5 AS pipenv
+#FROM python:slim AS pipenv
+FROM python:3.7-alpine3.8 as pipenv
 RUN pip3 install pipenv
 
 
@@ -7,7 +9,10 @@ WORKDIR /app
 COPY Pipfile /app/
 COPY Pipfile.lock /app/
 # Install a known vulnerable package
-RUN apk add --no-cache --update git=2.18.1-r0
+RUN apk add --no-cache --update git=2.18.2-r
+#RUN apt-get update && apt-get install -y \
+#     git \
+#     && rm -rf /var/lib/apt/lists/
 
 
 FROM parent AS base
@@ -29,6 +34,7 @@ FROM dev-base AS Security
 ARG SNYK_TOKEN
 RUN apk add --no-cache libstdc++
 COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/snyk
+#COPY --from=snyk/snyk:linux /usr/local/bin/snyk /usr/local/bin/snyk
 RUN pipenv update
 RUN snyk test
 
