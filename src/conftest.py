@@ -1,10 +1,10 @@
 import pytest
 
-from app import create_app
+from app import app as application
 
 
 @pytest.fixture
 def app():
-    app = create_app()
+    app = application
     app.debug = True
     return app

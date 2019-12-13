@@ -45,7 +45,7 @@ CMD ["flask", "shell"]
 
 
 FROM base AS release
-EXPOSE 5000
+ENV PORT=5000
 CMD ["python", "app.py"]
 
 
@@ -54,4 +54,4 @@ ENV FLASK_ENV=development
 
 
 FROM release AS Prod
-CMD ["gunicorn", "-b", ":5000", "app:create_app()"]
+CMD gunicorn --capture-output --access-log=- --log-file=- --workers=2 --threads=4 --worker-class=gthread --worker-tmp-dir /dev/shm -b :${PORT} "app:app"

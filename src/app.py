@@ -1,17 +1,19 @@
+from flask import Flask
 import logging
 
-from flask import Flask
+app = Flask(__name__)
+
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
 
 
-def create_app():
-    app = Flask(__name__)
-
-    @app.route("/")
-    def hello():
-        return "Hello World"
-
-    return app
+@app.route("/")
+def hello():
+    return "Hello World"
 
 
 if __name__ == "__main__":
-    create_app().run(host="0.0.0.0")
+    app.run(host="0.0.0.0")
