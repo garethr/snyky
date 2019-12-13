@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   conftest: kenfdev/conftest-orb@0.0.9
+  snyk: snyk/snyk@0.0.8
 jobs:
   python:
     docker:
@@ -43,9 +44,30 @@ jobs:
           name: Test Dockerfile
           command: conftest test --namespace docker Dockerfile
 
+  security:
+    docker:
+      - image: circleci/buildpack-deps:stretch 
+    environment:
+      IMAGE_NAME: garethr/snyky
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 18.09.3
+      - snyk/install_snyk
+      - run:
+          name: Build image
+          command: docker build --progress plain -t $IMAGE_NAME .
+          environment:
+            DOCKER_BUILDKIT: 1
+      - snyk/scan:
+          docker-image-name: $IMAGE_NAME
+          monitor-on-build: false
+          target-file: Dockerfile
+
 workflows:
   version: 2
   build:
     jobs:
       - python
       - policy
+      - security
