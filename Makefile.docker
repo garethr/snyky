@@ -18,6 +18,15 @@ endif
 build: check-buildkit
 	@$(BUILD) -t $(IMAGE) .
 
+slim: check-buildkit
+	@$(BUILD) --build-arg IMAGE=python:slim  -t $(IMAGE):slim .
+
+alpine: check-buildkit
+	@$(BUILD) --build-arg DISTRO=alpine --build-arg IMAGE=python:3.7-alpine3.8  -t $(IMAGE):alpine .
+
+distroless: check-buildkit
+	@$(BUILD) --target Distroless -t $(IMAGE):distroless .
+
 test: check-buildkit
 	@$(BUILD) --target Test .
 
@@ -27,4 +36,4 @@ snyk: check-buildkit check-snyk-token
 policy:
 	@$(BUILD) --target Policy .
 
-.PHONY: build test snyk policy
+.PHONY: build slim alpine distroless test snyk policy

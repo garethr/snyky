@@ -65,6 +65,20 @@ RUN conftest test --namespace docker Dockerfile
 RUN conftest test snyky.yaml
 
 
+FROM ${IMAGE} AS build-env
+COPY Pipfile .
+COPY Pipfile.lock .
+RUN pip install pipenv && pipenv install --system --deploy
+
+
+FROM gcr.io/distroless/python3 as Distroless
+WORKDIR src /app
+COPY --from=build-env /usr/local/lib/python3.7/site-packages /site-packages
+COPY src/ .
+ENV PYTHONPATH=/site-packages
+CMD ["run.py", "app:app"]
+
+
 FROM base AS Shell
 CMD ["flask", "shell"] 
 
@@ -79,4 +93,7 @@ ENV FLASK_ENV=development
 
 
 FROM release AS Prod
-CMD gunicorn --capture-output --access-logfile=- --log-file=- --workers=2 --threads=4 --worker-class=gthread --worker-tmp-dir /dev/shm -b :${PORT} "app:app"
+CMD ["gunicorn", "app:app"]
+
+
+

@@ -1,3 +1,4 @@
+import os
 import structlog
 import log_helper
 
@@ -36,3 +37,13 @@ logconfig_dict = {
         },
     },
 }
+
+capture_output = True
+access_logfile = "-"
+log_file = "-"
+workers = 2
+threads = 4
+worker_class = "gthread"
+woker_tmp_dir = "/dev/shm"
+port = os.getenv('PORT') or 8000
+bind = ":%s" % port
