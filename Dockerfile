@@ -1,6 +1,12 @@
-#FROM python:3.7.5 AS pipenv
-FROM python:slim AS pipenv
-#FROM python:3.7-alpine3.8 as pipenv
+ARG IMAGE=python:3.7.5
+# python:slim
+# python:3.7-alpine3.8
+ARG DISTRO=debian
+
+FROM ${IMAGE} as image
+
+
+FROM image as pipenv
 RUN pip3 install pipenv
 
 
@@ -8,14 +14,21 @@ FROM pipenv AS parent
 WORKDIR /app
 COPY Pipfile /app/
 COPY Pipfile.lock /app/
+
+
+FROM parent AS parent-debian
 # Install a known vulnerable package
-#RUN apk add --no-cache --update git=2.18.2-r
 RUN apt-get update && apt-get install -y \
      git \
      && rm -rf /var/lib/apt/lists/
 
 
-FROM parent AS base
+FROM parent AS parent-alpine
+# Install a known vulnerable package
+RUN apk add --no-cache --update git=2.18.2-r
+
+
+FROM parent-${DISTRO} AS base
 RUN pipenv install --deploy --system
 COPY src /app
 
@@ -30,11 +43,17 @@ FROM dev-base AS Test
 RUN pipenv run pytest
 
 
-FROM dev-base AS Security
-ARG SNYK_TOKEN
-#RUN apk add --no-cache libstdc++
-#COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/snyk
+FROM dev-base as security-debian
 COPY --from=snyk/snyk:linux /usr/local/bin/snyk /usr/local/bin/snyk
+
+
+FROM dev-base as security-alpine
+RUN apk add --no-cache libstdc++
+COPY --from=snyk/snyk:alpine /usr/local/bin/snyk /usr/local/bin/snyk
+
+
+FROM security-${DISTRO} AS Security
+ARG SNYK_TOKEN
 RUN pipenv update
 RUN snyk test
 
