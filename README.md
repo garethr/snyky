@@ -321,6 +321,9 @@ Snyky also demonstrates different ways of integrating vulnerability scanning wit
 4. [In a Tekton Pipeline](#4-in-a-tekton-pipeline-1)
 5. [Using Docker](#5-using-docker-1)
 
+In the Snyk dashboard this looks like:
+
+![Snyky in Snyk](assets/snyk.png)
 
 ### 1. Using Snyk locally
 
