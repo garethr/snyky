@@ -1,4 +1,4 @@
-ARG IMAGE=python:3.7.5
+ARG IMAGE=python:3.12.0b4
 # python:slim
 # python:3.7-alpine3.8
 ARG DISTRO=debian
